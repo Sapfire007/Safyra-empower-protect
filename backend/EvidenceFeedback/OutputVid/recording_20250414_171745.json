@@ -1,0 +1,11 @@
+{
+    "video_file": "recording_20250414_171745.mp4",
+    "recorded_at": "2025-04-14T17:17:50.161121",
+    "alert_info": {
+        "ip": "115.244.41.214",
+        "date": "4/14/2025",
+        "time": "5:17:41 PM",
+        "alert": "Gun detected with 99.9% confidence",
+        "timestamp": 1744631261945
+    }
+}

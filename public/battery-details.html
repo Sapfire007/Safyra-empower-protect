@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Battery Details - Safyra</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .text-safyra-navy { color: #1A365D; }
+    .text-safyra-gold { color: #D4AF37; }
+    .bg-safyra-navy { background-color: #1A365D; }
+    .bg-safyra-gold { background-color: #D4AF37; }
+    .bg-safyra-lightGray { background-color: #F7F7F7; }
+    .border-safyra-gold { border-color: #D4AF37; }
+    
+    .battery-circle {
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold text-safyra-navy">Battery Details</h1>
+        <p class="text-gray-600 mt-2">
+          Monitor and manage your Safyra device's battery performance
+        </p>
+      </div>
+      
+      <div id="loading" class="flex items-center justify-center py-20">
+        <div class="text-center">
+          <div class="inline-block h-12 w-12 border-4 border-safyra-gold border-t-transparent rounded-full animate-spin"></div>
+          <p class="mt-4 text-safyra-navy">Loading battery information...</p>
+        </div>
+      </div>
+      
+      <div id="battery-content" class="hidden space-y-6">
+        <!-- Main Battery Status Card -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden">
+          <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center gap-3">
+              <svg id="battery-icon" class="h-8 w-8 text-green-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12H3v8a1 1 0 001 1h16a1 1 0 001-1v-8h-2m-8-4V4a1 1 0 00-1-1H9a1 1 0 00-1 1v4m0 0h8"/>
+              </svg>
+              <h2 class="text-2xl font-bold text-safyra-navy">Current Battery Status</h2>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex flex-col items-center mb-6">
+              <div class="relative w-40 h-40 mb-4">
+                <svg class="w-full h-full" viewBox="0 0 100 100">
+                  <circle
+                    class="text-gray-200"
+                    stroke="currentColor"
+                    fill="transparent"
+                    stroke-width="8"
+                    r="40"
+                    cx="50"
+                    cy="50"
+                  />
+                  <circle
+                    id="battery-circle"
+                    class="text-safyra-gold battery-circle"
+                    stroke="currentColor"
+                    fill="transparent"
+                    stroke-width="8"
+                    stroke-linecap="round"
+                    r="40"
+                    cx="50"
+                    cy="50"
+                    stroke-dasharray="251.2"
+                    stroke-dashoffset="55"
+                  />
+                </svg>
+                <div class="absolute inset-0 flex items-center justify-center">
+                  <span id="battery-percentage" class="text-4xl font-bold text-safyra-navy">78%</span>
+                </div>
+              </div>
+              <p id="battery-status" class="text-lg text-gray-600">
+                Discharging • 32 hours remaining
+              </p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+              <div class="flex items-center gap-3">
+                <svg class="h-5 w-5 text-safyra-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+                <div>
+                  <p class="text-sm text-gray-500">Last Charged</p>
+                  <p id="last-charged" class="font-medium">Nov 15, 2023, 08:30 AM</p>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-3">
+                <svg class="h-5 w-5 text-safyra-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                <div>
+                  <p class="text-sm text-gray-500">Charge Cycles</p>
+                  <p id="charge-cycles" class="font-medium">42</p>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-3">
+                <svg class="h-5 w-5 text-safyra-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                </svg>
+                <div>
+                  <p class="text-sm text-gray-500">Temperature</p>
+                  <p id="temperature" class="font-medium">28°C</p>
+                </div>
+              </div>
+              
+              <div class="flex items-center gap-3">
+                <svg class="h-5 w-5 text-safyra-gold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <div>
+                  <p class="text-sm text-gray-500">Battery Health</p>
+                  <p id="battery-health" class="font-medium">Good</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Battery Tips Card -->
+        <div class="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden">
+          <div class="p-4 border-b border-gray-200">
+            <h2 class="text-xl font-bold text-safyra-navy">Battery Tips</h2>
+          </div>
+          <div class="p-6">
+            <ul class="space-y-3">
+              <li class="flex items-start gap-2">
+                <div class="bg-green-100 p-1 rounded-full mt-0.5">
+                  <svg class="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </div>
+                <p class="text-gray-700">Charge your device when battery falls below 20% for optimal battery health.</p>
+              </li>
+              <li class="flex items-start gap-2">
+                <div class="bg-green-100 p-1 rounded-full mt-0.5">
+                  <svg class="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </div>
+                <p class="text-gray-700">Avoid exposing your device to extreme temperatures to preserve battery life.</p>
+              </li>
+              <li class="flex items-start gap-2">
+                <div class="bg-green-100 p-1 rounded-full mt-0.5">
+                  <svg class="h-4 w-4 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </div>
+                <p class="text-gray-700">For long-term storage, keep the battery charged at around 50%.</p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="mt-8 text-center">
+        <button 
+          onclick="window.close()"
+          class="px-4 py-2 bg-gray-200 text-safyra-navy rounded-md hover:bg-gray-300 transition-colors duration-300"
+        >
+          Close Window
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simulate loading data from the backend
+    setTimeout(() => {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('battery-content').classList.remove('hidden');
+      
+      // Set battery level and adjust the circle
+      const batteryLevel = 78;
+      const circumference = 2 * Math.PI * 40;
+      const offset = circumference * (1 - batteryLevel / 100);
+      document.getElementById('battery-circle').setAttribute('stroke-dashoffset', offset);
+      
+      // Set battery icon color based on level
+      const batteryIcon = document.getElementById('battery-icon');
+      if (batteryLevel >= 75) {
+        batteryIcon.classList.remove('text-yellow-500', 'text-orange-500', 'text-red-500');
+        batteryIcon.classList.add('text-green-500');
+      } else if (batteryLevel >= 50) {
+        batteryIcon.classList.remove('text-green-500', 'text-orange-500', 'text-red-500');
+        batteryIcon.classList.add('text-yellow-500');
+      } else if (batteryLevel >= 25) {
+        batteryIcon.classList.remove('text-green-500', 'text-yellow-500', 'text-red-500');
+        batteryIcon.classList.add('text-orange-500');
+      } else {
+        batteryIcon.classList.remove('text-green-500', 'text-yellow-500', 'text-orange-500');
+        batteryIcon.classList.add('text-red-500');
+      }
+    }, 1500);
+  </script>
+</body>
+</html>

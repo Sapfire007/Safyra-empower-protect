@@ -1,0 +1,11 @@
+{
+    "video_file": "recording_20250414_171355.mp4",
+    "recorded_at": "2025-04-14T17:14:00.355977",
+    "alert_info": {
+        "ip": "115.244.41.214",
+        "date": "4/14/2025",
+        "time": "5:13:52 PM",
+        "alert": "Knife detected with 99.9% confidence",
+        "timestamp": 1744631032379
+    }
+}

@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Emergency Footage - Safyra</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --safyra-navy: #1a2942;
+      --safyra-gold: #d4af37;
+      --light-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #6c757d;
+      --border-color: #e9ecef;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      background-color: var(--safyra-navy);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
+    .logo-icon {
+      color: var(--safyra-gold);
+    }
+    
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--safyra-navy);
+      border-bottom: 2px solid var(--safyra-gold);
+      padding-bottom: 0.5rem;
+      display: inline-block;
+    }
+    
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+    
+    .card-header {
+      padding: 1rem 1.5rem;
+      background-color: rgba(212, 175, 55, 0.1);
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .card-title {
+      font-weight: 600;
+      color: var(--safyra-navy);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    .evidence-container {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+    }
+    
+    @media (max-width: 768px) {
+      .evidence-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .evidence-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .download-btn {
+      background-color: var(--safyra-navy);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: background-color 0.2s;
+    }
+    
+    .download-btn:hover {
+      background-color: #0f1a2e;
+    }
+    
+    .evidence-info {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+    }
+    
+    .evidence-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--safyra-navy);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .evidence-meta {
+      margin-bottom: 1.5rem;
+    }
+    
+    .meta-item {
+      display: flex;
+      margin-bottom: 0.5rem;
+    }
+    
+    .meta-label {
+      font-weight: 600;
+      width: 120px;
+      color: var(--text-secondary);
+    }
+    
+    .meta-value {
+      flex: 1;
+    }
+    
+    .details-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--safyra-navy);
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    
+    .detail-item {
+      background-color: rgba(212, 175, 55, 0.05);
+      padding: 0.75rem;
+      border-radius: 4px;
+    }
+    
+    .detail-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+      font-weight: 500;
+    }
+    
+    .btn-close {
+      background-color: var(--safyra-navy);
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .btn-close:hover {
+      background-color: #0f1a2e;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <i class="fas fa-shield-alt logo-icon"></i>
+      <span>Safyra</span>
+    </div>
+    <button class="btn-close" onclick="window.close()">
+      <i class="fas fa-times"></i>
+      <span>Close</span>
+    </button>
+  </header>
+
+  <div class="container">
+    <h1 class="page-title">Emergency Footage</h1>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <i class="fas fa-video"></i>
+          <span>Recorded Evidence</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="evidence-container" class="evidence-container">
+          <div class="evidence-actions">
+            <a id="download-link" href="#" class="download-btn" download>
+              <i class="fas fa-download"></i>
+              <span>Download Video</span>
+            </a>
+            <div id="file-info"></div>
+          </div>
+          <div class="evidence-info">
+            <h2 id="evidence-title" class="evidence-title">Loading evidence details...</h2>
+            <div id="evidence-meta" class="evidence-meta"></div>
+            <div class="details-section">
+              <h3 class="details-title">Alert Details</h3>
+              <div id="details-grid" class="details-grid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        // Fetch all available footage data
+        const response = await fetch(`http://localhost:5000/api/emergency-footage`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.data || data.data.length === 0) {
+          throw new Error('No footage data available');
+        }
+        
+        // Sort by recorded_at date (newest first)
+        const sortedFootage = data.data.sort((a, b) => {
+          const dateA = new Date(a.recorded_at || 0);
+          const dateB = new Date(b.recorded_at || 0);
+          return dateB - dateA;
+        });
+        
+        // Get the most recent footage
+        const latestFootage = sortedFootage[0];
+        const videoFileName = latestFootage.video_file;
+        const videoPath = `http://localhost:5000/emergency-videos/${videoFileName}`;
+        
+        console.log('Latest footage found:', videoFileName);
+        
+        // Set up download link
+        const downloadLink = document.getElementById('download-link');
+        downloadLink.href = videoPath;
+        downloadLink.setAttribute('download', videoFileName);
+        
+        // Display the evidence details
+        displayEvidenceDetails(latestFootage);
+        
+        // Check if video file exists and get its size
+        const videoResponse = await fetch(videoPath, { method: 'HEAD' });
+        if (videoResponse.ok) {
+          const fileSize = videoResponse.headers.get('Content-Length');
+          if (fileSize) {
+            const fileSizeMB = (parseInt(fileSize) / (1024 * 1024)).toFixed(2);
+            document.getElementById('file-info').innerHTML = `
+              <div style="margin-top: 1rem; text-align: center; color: var(--text-secondary);">
+                <i class="fas fa-file-video"></i>
+                <span>File size: ${fileSizeMB} MB</span>
+              </div>
+            `;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading evidence details:', error);
+        
+        // Display error message
+        document.getElementById('evidence-container').innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+            <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: var(--safyra-gold); margin-bottom: 1rem;"></i>
+            <h3>Error Loading Footage</h3>
+            <p>${error.message || 'Failed to load emergency footage data'}</p>
+            <button onclick="location.reload()" style="margin-top: 1rem; padding: 0.5rem 1rem; background-color: var(--safyra-navy); color: white; border: none; border-radius: 4px; cursor: pointer;">
+              <i class="fas fa-sync-alt"></i> Retry
+            </button>
+          </div>
+        `;
+      }
+    });
+    
+    function displayEvidenceDetails(data) {
+      // Set the evidence title
+      const alertInfo = data.alert_info || {};
+      document.getElementById('evidence-title').textContent = alertInfo.alert || 'Emergency Recording';
+      
+      // Set the metadata
+      const metaContainer = document.getElementById('evidence-meta');
+      metaContainer.innerHTML = `
+        <div class="meta-item">
+          <div class="meta-label">Recorded At:</div>
+          <div class="meta-value">${formatDate(data.recorded_at)}</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-label">File Name:</div>
+          <div class="meta-value">${data.video_file}</div>
+        </div>
+      `;
+      
+      // Set the alert details
+      const detailsGrid = document.getElementById('details-grid');
+      detailsGrid.innerHTML = '';
+      
+      if (alertInfo) {
+        Object.entries(alertInfo).forEach(([key, value]) => {
+          if (typeof value !== 'object' && key !== 'alert') {
+            const detailItem = document.createElement('div');
+            detailItem.className = 'detail-item';
+            detailItem.innerHTML = `
+              <div class="detail-label">${key.replace(/_/g, ' ')}</div>
+              <div class="detail-value">${value}</div>
+            `;
+            detailsGrid.appendChild(detailItem);
+          }
+        });
+      }
+    }
+    
+    function formatDate(timestamp) {
+      if (!timestamp) return 'Unknown';
+      
+      try {
+        const date = new Date(timestamp);
+        return date.toLocaleString();
+      } catch (e) {
+        return timestamp;
+      }
+    }
+  </script>
+</body>
+</html>

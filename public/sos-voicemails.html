@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOS Voicemails - Safyra</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --safyra-navy: #1a2942;
+      --safyra-gold: #d4af37;
+      --light-bg: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #6c757d;
+      --border-color: #e9ecef;
+      --danger: #dc3545;
+      --success: #28a745;
+      --warning: #ffc107;
+      --info: #17a2b8;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light-bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      background-color: var(--safyra-navy);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
+    .logo-icon {
+      color: var(--safyra-gold);
+    }
+    
+    .page-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: var(--safyra-navy);
+      border-bottom: 2px solid var(--safyra-gold);
+      padding-bottom: 0.5rem;
+      display: inline-block;
+    }
+    
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+      padding: 1rem 1.5rem;
+      background-color: rgba(212, 175, 55, 0.1);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .card-title {
+      font-weight: 600;
+      color: var(--safyra-navy);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .card-body {
+      padding: 1.5rem;
+    }
+    
+    .voicemail-list {
+      display: grid;
+      gap: 1rem;
+    }
+    
+    .voicemail-item {
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      transition: background-color 0.2s;
+    }
+    
+    .voicemail-item:hover {
+      background-color: rgba(212, 175, 55, 0.05);
+    }
+    
+    .voicemail-icon {
+      font-size: 1.5rem;
+      color: var(--safyra-gold);
+      background-color: rgba(212, 175, 55, 0.1);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .voicemail-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .voicemail-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    
+    .voicemail-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .voicemail-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .voicemail-controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: none;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background-color: var(--safyra-gold);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--safyra-navy);
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--safyra-gold);
+      color: var(--safyra-gold);
+    }
+    
+    .btn-outline:hover {
+      background-color: var(--safyra-gold);
+      color: white;
+    }
+    
+    .btn-close {
+      background-color: var(--safyra-navy);
+      color: white;
+    }
+    
+    .btn-close:hover {
+      background-color: #0f1a2e;
+    }
+    
+    .audio-player {
+      width: 100%;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    
+    .audio-player.active {
+      display: block;
+    }
+    
+    .no-voicemails {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-secondary);
+    }
+    
+    .no-voicemails i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: var(--safyra-gold);
+      opacity: 0.5;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(212, 175, 55, 0.1);
+      border-radius: 50%;
+      border-top: 4px solid var(--safyra-gold);
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .details-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .detail-item {
+      background-color: rgba(212, 175, 55, 0.05);
+      padding: 0.75rem;
+      border-radius: 4px;
+    }
+    
+    .detail-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 0.25rem;
+    }
+    
+    .detail-value {
+      font-weight: 500;
+    }
+    
+    @media (max-width: 768px) {
+      .voicemail-item {
+        grid-template-columns: 1fr;
+      }
+      
+      .voicemail-icon {
+        margin-bottom: 0.5rem;
+      }
+      
+      .voicemail-controls {
+        margin-top: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <i class="fas fa-shield-alt logo-icon"></i>
+      <span>Safyra</span>
+    </div>
+    <button class="btn btn-close" onclick="window.close()">
+      <i class="fas fa-times"></i>
+      <span>Close</span>
+    </button>
+  </header>
+
+  <div class="container">
+    <h1 class="page-title">SOS Voicemails</h1>
+    
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <i class="fas fa-microphone"></i>
+          <span>Emergency Voice Recordings</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="voicemail-container">
+          <div class="loading">
+            <div class="spinner"></div>
+            <p>Loading voicemails...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Fetch SOS voicemails data from the API
+    async function fetchVoicemails() {
+      try {
+        const response = await fetch('http://localhost:5000/api/sos-voicemails');
+        
+        if (!response.ok) {
+          throw new Error(`Server responded with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.data;
+      } catch (error) {
+        console.error('Error fetching SOS voicemails:', error);
+        return null;
+      }
+    }
+
+    // Format date for display
+    function formatDate(timestamp) {
+      const date = new Date(timestamp);
+      return date.toLocaleString();
+    }
+
+    // Format duration for display
+    function formatDuration(seconds) {
+      if (!seconds || seconds === "Unknown") return "Unknown";
+      
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = Math.floor(seconds % 60);
+      return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+    }
+
+    // Format geolocation data
+    function formatGeolocation(metadata) {
+      if (!metadata.geolocation) return 'Unknown location';
+      
+      const geo = metadata.geolocation;
+      let locationText = '';
+      
+      // Format city, region, country
+      const parts = [];
+      if (geo.city) parts.push(geo.city);
+      if (geo.region) parts.push(geo.region);
+      if (geo.country) parts.push(geo.country);
+      
+      locationText = parts.join(', ');
+      
+      // Add coordinates if available
+      if (geo.location) {
+        locationText += `<br><span class="detail-label">Coordinates:</span> ${geo.location}`;
+      }
+      
+      return locationText;
+    }
+
+    // Toggle audio player visibility
+    function toggleAudioPlayer(id) {
+      const player = document.getElementById(`player-${id}`);
+      if (player.classList.contains('active')) {
+        player.classList.remove('active');
+      } else {
+        // Hide all other players
+        document.querySelectorAll('.audio-player.active').forEach(p => {
+          p.classList.remove('active');
+        });
+        player.classList.add('active');
+      }
+    }
+
+    // Render the voicemails list
+    async function renderVoicemails() {
+      const container = document.getElementById('voicemail-container');
+      const voicemails = await fetchVoicemails();
+      
+      if (!voicemails) {
+        container.innerHTML = `
+          <div class="no-voicemails">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Failed to load voicemails. Please try again later.</p>
+            <p>Make sure the server is running and the OutputSOSaudio directory exists with .json and .mp3/.wav files.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      if (voicemails.length === 0) {
+        container.innerHTML = `
+          <div class="no-voicemails">
+            <i class="fas fa-microphone-slash"></i>
+            <p>No voicemails found in the OutputSOSaudio directory.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Create the voicemail list
+      const voicemailList = document.createElement('div');
+      voicemailList.className = 'voicemail-list';
+      
+      voicemails.forEach(voicemail => {
+        const voicemailItem = document.createElement('div');
+        voicemailItem.className = 'voicemail-item';
+        
+        // Format location data
+        const location = formatGeolocation(voicemail.metadata);
+        const emergency = voicemail.metadata.emergency || 'Emergency call';
+        
+        // Format timestamp for display
+        const displayTimestamp = voicemail.metadata.timestamp || formatDate(voicemail.timestamp);
+        
+        voicemailItem.innerHTML = `
+          <div class="voicemail-icon">
+            <i class="fas fa-microphone"></i>
+          </div>
+          <div class="voicemail-info">
+            <div class="voicemail-title">Emergency Recording</div>
+            <div class="voicemail-meta">
+              <span><i class="fas fa-calendar"></i> ${displayTimestamp}</span>
+              <span><i class="fas fa-clock"></i> ${voicemail.metadata.time || formatDuration(voicemail.duration)}</span>
+            </div>
+            <div class="voicemail-meta" style="margin-top: 5px;">
+              <span><i class="fas fa-map-marker-alt"></i> ${location}</span>
+            </div>
+            <div class="audio-player" id="player-${voicemail.id}">
+              ${voicemail.audioFile ? 
+                `<audio controls style="width: 100%; margin-top: 10px;">
+                  <source src="${voicemail.audioFile}" type="${voicemail.audioFile.endsWith('.mp3') ? 'audio/mpeg' : 'audio/wav'}">
+                  Your browser does not support the audio element.
+                </audio>` : 
+                '<p>Audio file not available</p>'
+              }
+              <div class="details-row">
+                ${Object.entries(voicemail.metadata).map(([key, value]) => {
+                  // Skip certain fields that are already displayed or complex objects
+                  if (key !== 'timestamp' && key !== 'duration' && key !== 'emergency' && 
+                      key !== 'location' && key !== 'geolocation' && key !== 'date' && 
+                      key !== 'time' && typeof value !== 'object') {
+                    return `
+                      <div class="detail-item">
+                        <div class="detail-label">${key.replace('_', ' ')}</div>
+                        <div class="detail-value">${value}</div>
+                      </div>
+                    `;
+                  }
+                  return '';
+                }).join('')}
+              </div>
+            </div>
+          </div>
+          <div class="voicemail-controls">
+            <button class="btn btn-primary" onclick="toggleAudioPlayer('${voicemail.id}')">
+              <i class="fas fa-play"></i>
+              <span>${voicemail.audioFile ? 'Play' : 'Details'}</span>
+            </button>
+          </div>
+        `;
+        
+        voicemailList.appendChild(voicemailItem);
+      });
+      
+      container.innerHTML = '';
+      container.appendChild(voicemailList);
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', renderVoicemails);
+  </script>
+</body>
+</html>

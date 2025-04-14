@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOS Reports - Safyra</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    header {
+      background-color: #1a2942;
+      color: #d4af37;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .logo-icon {
+      font-size: 1.8rem;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      color: #1a2942;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .alert-card {
+      border-left: 4px solid #ea4335;
+      background-color: #fce8e6;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+    }
+    .alert-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+    .alert-type {
+      color: #ea4335;
+    }
+    .alert-time {
+      color: #666;
+      font-size: 0.9rem;
+    }
+    .alert-details {
+      margin-top: 0.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+    .detail-label {
+      font-size: 0.8rem;
+      color: #666;
+    }
+    .detail-value {
+      font-weight: 500;
+    }
+    .no-alerts {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+    }
+    .back-button {
+      background-color: #d4af37;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    .back-button:hover {
+      background-color: #1a2942;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span class="logo-icon">🛡️</span>
+      <span>Safyra</span>
+    </div>
+    <button class="back-button" onclick="window.close()">Close Window</button>
+  </header>
+
+  <div class="container">
+    <h1>SOS Reports</h1>
+    
+    <div class="card">
+      <h2>Recent Alerts</h2>
+      <div id="alerts-container">
+        <div class="loading">Loading SOS reports...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Fetch SOS reports data from the API
+    async function fetchSOSReports() {
+      try {
+        const response = await fetch('http://localhost:5000/api/sos-reports');
+        
+        if (!response.ok) {
+          throw new Error(`Server responded with status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        return data.data;
+      } catch (error) {
+        console.error('Error fetching SOS reports:', error);
+        return null;
+      }
+    }
+
+    // Format date and time for display
+    function formatDateTime(dateStr, timeStr) {
+      return `${dateStr} at ${timeStr}`;
+    }
+
+    // Render the SOS reports
+    async function renderSOSReports() {
+      const alertsContainer = document.getElementById('alerts-container');
+      const sosReport = await fetchSOSReports();
+      
+      if (!sosReport) {
+        alertsContainer.innerHTML = `
+          <div class="no-alerts">
+            <p>Failed to load SOS reports. Please try again later.</p>
+          </div>
+        `;
+        return;
+      }
+      
+      if (Object.keys(sosReport).length === 0) {
+        alertsContainer.innerHTML = `
+          <div class="no-alerts">
+            <p>No SOS reports found.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Extract the weapon type from the alert message
+      const alertMessage = sosReport.alert;
+      const weaponType = alertMessage.split(' ')[0];
+      
+      // Create the alert card
+      const alertCard = document.createElement('div');
+      alertCard.className = 'alert-card';
+      alertCard.innerHTML = `
+        <div class="alert-header">
+          <span class="alert-type">${weaponType} Detection Alert</span>
+          <span class="alert-time">${formatDateTime(sosReport.date, sosReport.time)}</span>
+        </div>
+        <div class="alert-message">
+          ${sosReport.alert}
+        </div>
+        <div class="alert-details">
+          <div class="detail-item">
+            <span class="detail-label">IP Address</span>
+            <span class="detail-value">${sosReport.ip}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Timestamp</span>
+            <span class="detail-value">${new Date(sosReport.timestamp).toLocaleString()}</span>
+          </div>
+        </div>
+      `;
+      
+      alertsContainer.innerHTML = '';
+      alertsContainer.appendChild(alertCard);
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', renderSOSReports);
+  </script>
+</body>
+</html>

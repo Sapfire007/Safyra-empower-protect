@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weapon Detection System</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a73e8;
+            margin-right: 10px;
+        }
+        h1 {
+            font-size: 22px;
+            margin: 0;
+            color: #333;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-left: 10px;
+            background-color: #e8eaed;
+        }
+        .status-badge.active {
+            background-color: #d2e3fc;
+            color: #1967d2;
+        }
+        .status-badge.alert {
+            background-color: #fce8e6;
+            color: #d93025;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .webcam-section {
+            display: flex;
+            flex-direction: column;
+        }
+        .webcam-container {
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #f5f5f5;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        .detection-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        .detection-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        .label-container {
+            font-family: monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .alert-status {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-weight: 500;
+            background-color: #f8f9fa;
+            border-left: 4px solid #dadce0;
+        }
+        .alert-status.warning {
+            background-color: #fff8e1;
+            border-left-color: #ffc107;
+            color: #856404;
+        }
+        .alert-status.danger {
+            background-color: #fce8e6;
+            border-left-color: #d93025;
+            color: #d93025;
+        }
+        .alert-history {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .alert-history-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #444;
+        }
+        .alert-entry {
+            padding: 8px 12px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-left: 3px solid #dadce0;
+        }
+        .alert-entry.gun {
+            border-left-color: #d93025;
+            background-color: #fce8e6;
+        }
+        .alert-entry.knife {
+            border-left-color: #f29900;
+            background-color: #fef7e0;
+        }
+        button {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #1765cc;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 6px;
+            background-color: #dadce0;
+        }
+        .status-indicator.active {
+            background-color: #34a853;
+        }
+        .status-indicator.warning {
+            background-color: #fbbc04;
+        }
+        .status-indicator.danger {
+            background-color: #ea4335;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🛡️</div>
+            <h1>Weapon Detection System</h1>
+            <div id="system-status" class="status-badge">Inactive</div>
+        </header>
+        
+        <button type="button" onclick="init()">Start Detection</button>
+        
+        <div class="main-content">
+            <div class="webcam-section">
+                <div id="webcam-container" class="webcam-container">
+                    <p>Camera feed will appear here</p>
+                </div>
+                <div id="alert-status" class="alert-status">System ready. Click "Start Detection" to begin monitoring.</div>
+            </div>
+            
+            <div class="detection-section">
+                <div class="detection-header">Detection Results</div>
+                <div id="label-container" class="label-container">No data available</div>
+            </div>
+        </div>
+        
+        <div class="alert-history">
+            <div class="alert-history-header">Alert History</div>
+            <div id="alert-history"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+    <script type="text/javascript">
+        // the link to your model provided by Teachable Machine export panel
+        const URL = "./tm-my-image-model/";
+
+        let model, webcam, labelContainer, maxPredictions;
+        
+        // Weapon detection tracking variables
+        let weaponDetectionStartTime = null;
+        let isWeaponDetected = false;
+        let alertGenerated = false;
+        const DETECTION_THRESHOLD = 0.6; // Lowered threshold to make detection easier
+        const DETECTION_DURATION = 3000; // 3 seconds in milliseconds
+        const alertStatusElement = document.getElementById("alert-status");
+        const systemStatusElement = document.getElementById("system-status");
+
+        // Load the image model and setup the webcam
+        async function init() {
+            const modelURL = URL + "model.json";
+            const metadataURL = URL + "metadata.json";
+
+            systemStatusElement.textContent = "Loading";
+            systemStatusElement.className = "status-badge";
+            alertStatusElement.innerHTML = "<span class='status-indicator'></span>Loading model...";
+            alertStatusElement.className = "alert-status";
+            
+            try {
+                // load the model and metadata
+                model = await tmImage.load(modelURL, metadataURL);
+                maxPredictions = model.getTotalClasses();
+
+                // Convenience function to setup a webcam
+                const flip = true; // whether to flip the webcam
+                webcam = new tmImage.Webcam(200, 200, flip); // width, height, flip
+                await webcam.setup(); // request access to the webcam
+                await webcam.play();
+                window.requestAnimationFrame(loop);
+
+                // append elements to the DOM
+                document.getElementById("webcam-container").innerHTML = "";
+                document.getElementById("webcam-container").appendChild(webcam.canvas);
+                labelContainer = document.getElementById("label-container");
+                labelContainer.innerHTML = "";
+                for (let i = 0; i < maxPredictions; i++) { // and class labels
+                    labelContainer.appendChild(document.createElement("div"));
+                }
+                
+                systemStatusElement.textContent = "Active";
+                systemStatusElement.className = "status-badge active";
+                alertStatusElement.innerHTML = "<span class='status-indicator active'></span>Model loaded successfully. Monitoring for weapons...";
+                alertStatusElement.className = "alert-status";
+            } catch (error) {
+                systemStatusElement.textContent = "Error";
+                systemStatusElement.className = "status-badge alert";
+                alertStatusElement.innerHTML = "<span class='status-indicator danger'></span>Error loading model: " + error.message;
+                alertStatusElement.className = "alert-status danger";
+                console.error("Error initializing:", error);
+            }
+        }
+
+        async function loop() {
+            webcam.update(); // update the webcam frame
+            await predict();
+            window.requestAnimationFrame(loop);
+        }
+
+        // run the webcam image through the image model
+        async function predict() {
+            // predict can take in an image, video or canvas html element
+            const prediction = await model.predict(webcam.canvas);
+            
+            // Check for weapon detection (gun or knife)
+            let currentWeaponDetected = false;
+            let detectedWeaponClass = "";
+            let highestProbability = 0;
+            
+            for (let i = 0; i < maxPredictions; i++) {
+                const classPrediction =
+                    prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+                labelContainer.childNodes[i].innerHTML = classPrediction;
+                
+                const className = prediction[i].className;
+                const probability = prediction[i].probability;
+                
+                // Check if this is a gun class (using exact class name from your model)
+                if (className === "Guns" && probability > DETECTION_THRESHOLD) {
+                    currentWeaponDetected = true;
+                    if (probability > highestProbability) {
+                        highestProbability = probability;
+                        detectedWeaponClass = "Gun";
+                    }
+                }
+                
+                // Check if this is a knife class (using exact class name from your model)
+                if (className === "Knives" && probability > DETECTION_THRESHOLD) {
+                    currentWeaponDetected = true;
+                    if (probability > highestProbability) {
+                        highestProbability = probability;
+                        detectedWeaponClass = "Knife";
+                    }
+                }
+            }
+            
+            // Track weapon detection time
+            if (currentWeaponDetected) {
+                if (!isWeaponDetected) {
+                    // First detection of weapon
+                    weaponDetectionStartTime = new Date().getTime();
+                    isWeaponDetected = true;
+                    alertStatusElement.innerHTML = `<span class='status-indicator warning'></span>Potential ${detectedWeaponClass} detected! Confirming...`;
+                    alertStatusElement.className = "alert-status warning";
+                    console.log(`Detection started: ${detectedWeaponClass} with ${highestProbability.toFixed(2)} confidence`);
+                } else {
+                    // Continuing detection of weapon
+                    const currentTime = new Date().getTime();
+                    const detectionDuration = currentTime - weaponDetectionStartTime;
+                    
+                    // Update countdown
+                    const remainingTime = Math.max(0, (DETECTION_DURATION - detectionDuration) / 1000).toFixed(1);
+                    alertStatusElement.innerHTML = `<span class='status-indicator warning'></span>Potential ${detectedWeaponClass} detected! Confirming... ${remainingTime}s`;
+                    alertStatusElement.className = "alert-status warning";
+                    
+                    // If weapon detected for more than 3 seconds and alert not yet generated
+                    if (detectionDuration >= DETECTION_DURATION && !alertGenerated) {
+                        console.log(`Alert triggered for: ${detectedWeaponClass} with ${highestProbability.toFixed(2)} confidence`);
+                        generateAlert(detectedWeaponClass, highestProbability);
+                        alertGenerated = true;
+                    }
+                }
+            } else {
+                // Reset detection if weapon no longer detected
+                if (isWeaponDetected) {
+                    alertStatusElement.innerHTML = "<span class='status-indicator active'></span>No weapons detected";
+                    alertStatusElement.className = "alert-status";
+                }
+                isWeaponDetected = false;
+                weaponDetectionStartTime = null;
+                
+                // Reset alert status after weapon is no longer detected for a while
+                if (alertGenerated) {
+                    setTimeout(() => {
+                        alertGenerated = false;
+                    }, 10000); // Reset alert status after 10 seconds
+                }
+            }
+        }
+        
+        // Generate response.json file with alert information
+        async function generateAlert(weaponType, confidence) {
+            try {
+                // Get client IP address
+                let clientIP = "Unknown";
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    clientIP = ipData.ip;
+                } catch (ipError) {
+                    console.error("Could not fetch IP:", ipError);
+                }
+                
+                // Create alert data
+                const alertData = {
+                    ip: clientIP,
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().toLocaleTimeString(),
+                    alert: `${weaponType} detected with ${(confidence * 100).toFixed(1)}% confidence`,
+                    timestamp: new Date().getTime()
+                };
+                
+                // Save the data to the server using fetch API
+                try {
+                    const response = await fetch('/save-alert', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(alertData),
+                    });
+                    
+                    if (response.ok) {
+                        // Update status with success message
+                        alertStatusElement.innerHTML = `<span class='status-indicator danger'></span>⚠️ ALERT: ${weaponType} detected and confirmed! Alert data saved.`;
+                        alertStatusElement.className = "alert-status danger";
+                        
+                        // Add to alert history
+                        const historyDiv = document.getElementById('alert-history');
+                        const alertEntry = document.createElement('div');
+                        alertEntry.className = `alert-entry ${weaponType.toLowerCase()}`;
+                        alertEntry.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${weaponType} detected (${(confidence * 100).toFixed(1)}% confidence)`;
+                        historyDiv.insertBefore(alertEntry, historyDiv.firstChild);
+                    } else {
+                        throw new Error(`Server responded with status: ${response.status}`);
+                    }
+                } catch (saveError) {
+                    console.error("Error saving alert:", saveError);
+                    alertStatusElement.innerHTML = `<span class='status-indicator danger'></span>⚠️ ALERT: ${weaponType} detected! But couldn't save to file.`;
+                    alertStatusElement.className = "alert-status danger";
+                }
+                
+                console.log("Alert generated:", alertData);
+            } catch (error) {
+                alertStatusElement.innerHTML = "<span class='status-indicator danger'></span>Error generating alert: " + error.message;
+                alertStatusElement.className = "alert-status danger";
+                console.error("Error generating alert:", error);
+            }
+        }
+    </script>
+</body>
+</html>
